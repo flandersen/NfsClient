@@ -36,7 +36,7 @@ class nfs_pro_v3Packer(Packer):
         self.pack_string(data)
 
     def pack_cookieverf3(self, data):
-        self.pack_fopaque(const.NFS3_COOKIEVERFSIZE, data)
+        self.pack_uint64(data)
 
     def pack_createverf3(self, data):
         self.pack_fopaque(const.NFS3_CREATEVERFSIZE, data)
@@ -1036,7 +1036,7 @@ class nfs_pro_v3Unpacker(Unpacker):
         return data
 
     def unpack_cookieverf3(self):
-        data = self.unpack_fopaque(const.NFS3_COOKIEVERFSIZE)
+        data = self.unpack_uint64()
         return data
 
     def unpack_createverf3(self):

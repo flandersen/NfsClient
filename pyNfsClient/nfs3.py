@@ -285,11 +285,11 @@ class NFSv3(RPC):
         return unpacker.unpack_link3res()
 
     @fh_check
-    def readdir(self, dir_handle, cookie=0, cookie_verf='0', count=4096, auth=None):
+    def readdir(self, dir_handle, cookie=0, cookie_verf=0, count=4096, auth=None):
         packer = nfs_pro_v3Packer()
         packer.pack_readdir3args(readdir3args(dir=nfs_fh3(dir_handle),
                                               cookie=cookie,
-                                              cookieverf=str_to_bytes(cookie_verf),
+                                              cookieverf=cookie_verf,
                                               count=count))
 
         logger.debug("NFSv3 procedure %d: READDIR on %s" % (NFS3_PROCEDURE_READDIR, self.host))
@@ -299,11 +299,11 @@ class NFSv3(RPC):
         return unpacker.unpack_readdir3res()
 
     @fh_check
-    def readdirplus(self, dir_handle, cookie=0, cookie_verf='0', dircount=4096, maxcount=32768, auth=None):
+    def readdirplus(self, dir_handle, cookie=0, cookie_verf=0, dircount=4096, maxcount=32768, auth=None):
         packer = nfs_pro_v3Packer()
         packer.pack_readdirplus3args(readdirplus3args(dir=nfs_fh3(dir_handle),
                                                       cookie=cookie,
-                                                      cookieverf=str_to_bytes(cookie_verf),
+                                                      cookieverf=cookie_verf,
                                                       dircount=dircount,
                                                       maxcount=maxcount))
 
