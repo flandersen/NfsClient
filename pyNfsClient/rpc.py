@@ -1,7 +1,9 @@
 import logging
+import os
 import struct
 import socket
 import time
+from datetime import datetime
 from random import randint
 
 logger = logging.getLogger(__package__)
@@ -12,6 +14,7 @@ class RPCProtocolError(Exception):
 
 
 class RPC(object):
+
     connections = list()
 
     def __init__(self, host, port, timeout):
@@ -20,10 +23,25 @@ class RPC(object):
         self.timeout = timeout
         self.client = None
         self.client_port = None
+        self.init_xid()
+
+    def init_xid(self):
+        '''Initializes XID, the RPC transaction ID
+
+        It is recommended to initialize XID with a random value. 
+        With each transaction it is sufficient to increment the 
+        value by one.
+        '''
+        epoch = time.time()
+        total_seconds = int(epoch)
+        microsecond = int((epoch - total_seconds) * 1000000)
+        pid = os.getpid()
+        
+        self.xid = pid ^ total_seconds ^ microsecond
 
     def request(self, program, program_version, procedure, data=None, message_type=0, version=2, auth=None):
-
-        rpc_xid = int(time.time())
+        self.xid += 1
+        rpc_xid = self.xid
         rpc_message_type = message_type     # 0=call
         rpc_rpc_version = version
         rpc_program = program
@@ -108,11 +126,11 @@ class RPC(object):
 
             rpc = data[:24]
             (
-                rpc_XID,
+                rpc_xid,
                 rpc_Message_Type,
                 rpc_Reply_State,
-                rpc_Verifier_Flavor,
-                rpc_Verifier_Length,
+                rpc_verifier_flavor,
+                rpc_verifier_length,
                 rpc_Accept_State
             ) = struct.unpack('!LLLLLL', rpc)
 
