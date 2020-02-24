@@ -82,7 +82,12 @@ Below is a simple example which lookup a file and then do several operations on 
             lookup_res = nfs3.lookup(root_fh, "file.txt", auth)
             if lookup_res["status"] == NFS3_OK:
                 fh = lookup_res["resok"]["object"]["data"]
-                write_res = nfs3.write(fh, offset=0, count=11, content="Sample text",
+                
+                content="Sample text"
+                buffer = content.encode()
+                length = len(buffer)
+                
+                write_res = nfs3.write(fh, offset=0, count=length, buffer=buffer,
                                        stable_how=DATA_SYNC, auth=auth)
                 if write_res["status"] == NFS3_OK:
                     read_res = nfs3.read(fh, offset=0, auth=auth)
