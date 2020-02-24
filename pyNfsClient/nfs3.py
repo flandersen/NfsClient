@@ -147,13 +147,13 @@ class NFSv3(RPC):
         return unpacker.unpack_read3res()
 
     @fh_check
-    def write(self, file_handle, offset, count, content, stable_how, auth=None):
+    def write(self, file_handle, offset, count, buffer, stable_how, auth=None):
         packer = nfs_pro_v3Packer()
         packer.pack_write3args(write3args(file=nfs_fh3(file_handle),
                                           offset=offset,
                                           count=count,
                                           stable=stable_how,
-                                          data=str_to_bytes(content)))
+                                          data=buffer))
 
         logger.debug("NFSv3 procedure %d: WRITE on %s" % (NFS3_PROCEDURE_WRITE, self.host))
         res = self.nfs_request(NFS3_PROCEDURE_WRITE, packer.get_buffer(), auth if auth else self.auth)
